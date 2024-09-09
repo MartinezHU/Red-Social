@@ -1,30 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../home/screens/home_screen.dart';
-import '../providers/auth_provider.dart';
-import 'login_screen.dart';
+import '../utils/check_valid_tokens.dart';
 
 class AuthCheckScreen extends ConsumerWidget {
   const AuthCheckScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final authService = ref.read(authServiceProvider);
-
-    return FutureBuilder<bool>(
-      future: authService.isLoggedIn(),
+    return FutureBuilder<void>(
+      future: checkAndHandleAuth(ref, context),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         } else {
-          if (snapshot.hasData && snapshot.data == true) {
-            // Si el usuario está logueado, navega a la Home Screen
-            return const LoginScreen();
-          } else {
-            // Si no está logueado, muestra la pantalla de Login
-            return const HomeScreen();
+          // No es necesario manejar el resultado aquí porque la navegación se ha manejado en `checkAndHandleAuth`
+          // Solo comprobamos si hay errores
+          if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
           }
+
+          // Mostrar un widget vacío mientras se maneja la navegación
+          return Container();
         }
       },
     );

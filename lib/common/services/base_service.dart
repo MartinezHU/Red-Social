@@ -1,9 +1,9 @@
 import 'dart:convert';
 
+import 'package:http/http.dart' as http;
 import 'package:social_app/common/interfaces/json_serializable.dart';
 
 import 'common_service.dart';
-import 'package:http/http.dart' as http;
 
 class BaseService<T extends JsonSerializable> {
   final String baseUrl;
@@ -12,7 +12,8 @@ class BaseService<T extends JsonSerializable> {
   BaseService({required this.baseUrl, required this.fromJson});
 
   Future<List<T>> getAll() async {
-    final response = await http.get(Uri.parse('$baseUrl/'), headers: headers());
+    final response =
+        await http.get(Uri.parse('$baseUrl/'), headers: basicHeaders());
 
     if (response.statusCode == 200) {
       final data = await customAutoDecode(response);
@@ -31,7 +32,7 @@ class BaseService<T extends JsonSerializable> {
     try {
       final response = await http.get(
         Uri.parse('$baseUrl/$id'),
-        headers: headers(),
+        headers: basicHeaders(),
       );
 
       // Verifica el código de estado para determinar si la respuesta es exitosa
@@ -54,11 +55,33 @@ class BaseService<T extends JsonSerializable> {
     }
   }
 
+  Future<T> create(T entityToCreate) async {
+    try {
+      final headers = await authHeaders();
+
+      final response = await http.post(Uri.parse('$baseUrl/$entityToCreate/'),
+          headers: headers, body: jsonEncode(entityToCreate.toJson()));
+
+      if (response.statusCode == 200) {
+        dynamic jsonCreate = jsonDecode(response.body);
+        T createdEntity = fromJson(jsonCreate);
+        return createdEntity;
+      } else {
+        throw Exception(
+            'Failed to create $T with status code: ${response.statusCode}');
+      }
+    } catch (error) {
+      throw Exception('Error creating $entityToCreate : $error');
+    }
+  }
+
   Future<T> update(T entityToUpdate) async {
     try {
+      final headers = await authHeaders();
+
       final response = await http.patch(
         Uri.parse('$baseUrl/$entityToUpdate.id'),
-        headers: headers(),
+        headers: headers,
         body: jsonEncode(entityToUpdate.toJson()),
       );
 
@@ -77,8 +100,10 @@ class BaseService<T extends JsonSerializable> {
 
   Future<bool> delete(int id) async {
     try {
+      final headers = await authHeaders();
+
       final response =
-          await http.delete(Uri.parse('$baseUrl/$id'), headers: headers());
+      await http.delete(Uri.parse('$baseUrl/$id'), headers: headers);
 
       if (response.statusCode == 200) {
         return true;

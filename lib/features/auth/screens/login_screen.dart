@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:social_app/common/widgets/buttons/custom_buttom.dart';
-import 'package:social_app/common/widgets/text_fields/custom_text_field.dart';
-import 'package:social_app/common/widgets/text_fields/custom_text_field_password.dart';
+import 'package:social_app/common/widgets/buttons/custom_button.dart';
 
+import '../../../common/widgets/text/custom_text_field.dart';
+import '../../../common/widgets/text/custom_text_field_password.dart';
 import '../utils/handle_login.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -28,7 +28,7 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CustomTextField(label: 'Email', controller: _usernameController),
+            CustomTextField(label: 'Username', controller: _usernameController),
             PasswordTextField(
                 label: 'Password', controller: _passwordController),
             CustomButton(
@@ -45,4 +45,3 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 }
-

@@ -17,34 +17,37 @@ class BasePostsFeed extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final postsAsyncValue = ref.watch(postsProvider);
 
-    return RefreshIndicator(
-      onRefresh: () async {
-        ref.refresh(postsProvider);
-      },
-      child: postsAsyncValue.when(
-        data: (posts) {
-          if (posts.isEmpty) {
-            return const Center(child: Text('No posts available.'));
-          }
-          return ListView.builder(
-            itemCount: posts.length,
-            itemBuilder: (context, index) {
-              final post = posts[index];
-
-              return postBuilder != null
-                  ? postBuilder!(post)
-                  : PostBaseWidget(
-                      post: post,
-                      onTap: () {
-                        Navigator.pushNamed(context, '/postDetail',
-                            arguments: post.id);
-                      },
-                    );
-            },
-          );
+    return Scaffold(
+      body: RefreshIndicator(
+        onRefresh: () async {
+          return ref.refresh(postsProvider);
         },
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(child: Text('Error: $error')),
+        child: postsAsyncValue.when(
+          data: (posts) {
+            if (posts.isEmpty) {
+              return const Center(child: Text('No posts available.'));
+            }
+            return ListView.builder(
+              itemCount: posts.length,
+              itemBuilder: (context, index) {
+                final post = posts[index];
+
+                // Si el `postBuilder` no es nulo, usa esa implementación
+                return postBuilder != null
+                    ? postBuilder!(post)
+                    : PostBaseWidget(
+                        post: post,
+                        onTap: () {
+                          Navigator.pushNamed(context, '/postDetail',
+                              arguments: post.id);
+                        },
+                      );
+              },
+            );
+          },
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (error, stack) => Center(child: Text('Error: $error')),
+        ),
       ),
     );
   }

@@ -17,6 +17,7 @@ class PostDetailState {
       updatedAt: null,
       likesCount: 0,
       dislikesCount: 0,
+      commentsCount: 0,
       sharesCount: 0,
     ));
   }

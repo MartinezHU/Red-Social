@@ -33,7 +33,7 @@ class MyPersonalFeed extends ConsumerWidget {
                 children: [
                   ListTile(
                     leading: CircleAvatar(
-                      backgroundImage: NetworkImage(post.user.profilePic),
+                      backgroundImage: NetworkImage(post.user.profilePicUrl),
                     ),
                     title: Text(truncatedContent),
                     subtitle: Text(
